@@ -8,7 +8,7 @@ A pair of simple scripts to generate DNA barcodes with nice properties:
 - a guarantee that no code will contain runs of longer than three of the same base
 
 ### Dependencies
-- python 3.6 (though >3.4 may work)
+- Python 3.6 (though >3.4 may work)
 - Numba 0.36
 - Numpy > 1.12
 
