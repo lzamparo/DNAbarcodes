@@ -1,5 +1,4 @@
 import sys
-import random
 import numpy as np
 import numba
 import time
@@ -65,6 +64,7 @@ def verify_no_rep_constraints(barcode):
 
 def process_batch(numeric_batch, barcodes, last_index=0, max_codes=80000):
     ''' apply validation rules to each potential barcode in the batch '''
+    
     np.random.shuffle(numeric_batch)
     for barcode in numeric_batch:
         
@@ -93,9 +93,15 @@ max_codes = 80000
 with open(all_barcodes_file,'r') as infile, open(validated_code_file,'w') as outfile:
     batch = []
     codes = np.empty((max_codes,12),dtype=np.int64)
+    
     for line in infile:
         batch.append(line.strip())
         if len(batch) == lines_per_batch:
+           
+            if last_index >= max_codes:
+                print("Found all codes, exiting")
+                break
+            
             print("beginning with ", last_index, " barcodes...")
             print("read ", len(batch), " lines")
             
@@ -109,15 +115,8 @@ with open(all_barcodes_file,'r') as infile, open(validated_code_file,'w') as out
             print("result of batch processing is ", last_index, " qualified codes")
             print("time to process was: ", delta_t)
     
-        if last_index > max_codes:
-            print("Found all codes, exiting")
-            
+        
+    # write out set of codes to outfile        
     str_codes = numeric_to_dna(codes[0:last_index,:])
     for code in str_codes:
         print(code, file=outfile)
-    
-    
-
-
-
-

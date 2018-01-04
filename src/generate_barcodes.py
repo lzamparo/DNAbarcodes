@@ -19,14 +19,13 @@ def allstrings(alphabet, length):
         
     return c
 
-if __name__ == "__main__":
 
-    length = int(sys.argv[1])
-    alphabet = ['A', 'C', 'G', 'T']
-    outfile = sys.argv[2]
+length = int(sys.argv[1])
+alphabet = ['A', 'C', 'G', 'T']
+outfile = sys.argv[2]
 
-    my_strings = allstrings(alphabet, length)
-    with open(outfile,'w') as barcodes:
-        for s in my_strings:
-            outstring = ''.join(s)
-            print(outstring, file=barcodes)	
+my_strings = allstrings(alphabet, length)
+with open(outfile,'w') as barcodes:
+    for s in my_strings:
+        outstring = ''.join(s)
+        print(outstring, file=barcodes)	
