@@ -45,16 +45,17 @@ def verify_content_constraints(barcode, low = 0.10, high = 0.90):
     gc_content = barcode[np.logical_or(barcode == 3, barcode == 4)].shape[0] / (1.0 * 12)
     return (low < gc_content) & (gc_content < high)
 
-@numba.autojit    
+@numba.jit(nopython=True)
 def _verify_rep_constraint(barcode, run):
-    for i in barcode:
+    for i in range((barcode.shape[0] - run.shape[0])+1):
         result = True
-        for j in range(run.shape[0]):  
-            result = result and (barcode[i+j] == run[j])
+        for j in range(run.shape[0]):
+                result = result and (barcode[i+j] == run[j])
         if result:
             return False    # found a run, reject this barcode
     return True             # did not find a run, accept this barcode
 
+@numba.jit(nopython=True)
 def verify_no_rep_constraints(barcode):
     ''' Ensure there are no runs of more than three consecutive bases '''
     result = True
@@ -83,11 +84,12 @@ def process_batch(numeric_batch, barcodes, last_index=0, max_codes=80000):
 # open the barcode file
 all_barcodes_file = sys.argv[1]
 validated_code_file = sys.argv[2]
+max_codes = int(sys.argv[3])
+
 lines_per_batch = 10000
 
 # bookkeeping for code array
 last_index = 0
-max_codes = 80000
 
 # grow the set of barcodes one by one, ensuring they are 3 mismatches apart
 with open(all_barcodes_file,'r') as infile, open(validated_code_file,'w') as outfile:
