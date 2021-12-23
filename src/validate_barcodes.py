@@ -16,7 +16,7 @@ def _num_to_str(array):
     
 def dna_to_numeric(batch):
     ''' convert list of barcode strings in batch to a numpy array '''
-    numeric_batch = np.zeros((len(batch),12),dtype=np.int64)
+    numeric_batch = np.zeros((len(batch),barcode_len),dtype=np.int64)
     for i in range(len(batch)):
         numeric_batch[i,:] = _str_to_num(batch[i])
     return numeric_batch
@@ -42,7 +42,7 @@ def verify_mismatch_constraints(barcode, barcode_set, threshold=2):
 def verify_content_constraints(barcode, low = 0.10, high = 0.90):
     ''' Make sure the GC content of the barcode lies in [low,high] 
     and also that there are no repetitive triples of any nucleotides '''
-    gc_content = barcode[np.logical_or(barcode == 3, barcode == 4)].shape[0] / (1.0 * 12)
+    gc_content = barcode[np.logical_or(barcode == 3, barcode == 4)].shape[0] / (1.0 * barcode_len)
     return (low < gc_content) & (gc_content < high)
 
 @numba.jit(nopython=True)
@@ -72,8 +72,8 @@ def process_batch(numeric_batch, barcodes, last_index=0, max_codes=80000):
         if last_index == max_codes:
             break
         
-        if verify_mismatch_constraints(barcode, barcodes[0:last_index,:]) and \
-           verify_content_constraints(barcode) and \
+        if verify_mismatch_constraints(barcode, barcodes[0:last_index,:], mismatches) and \
+           verify_content_constraints(barcode, gc_low, gc_high) and \
            verify_no_rep_constraints(barcode):
             barcodes[last_index,:] = barcode
             last_index += 1
@@ -85,6 +85,10 @@ def process_batch(numeric_batch, barcodes, last_index=0, max_codes=80000):
 all_barcodes_file = sys.argv[1]
 validated_code_file = sys.argv[2]
 max_codes = int(sys.argv[3])
+barcode_len = int(sys.argv[4])
+gc_low = float(sys.argv[5])
+gc_high = float(sys.argv[6])
+mismatches = float(sys.argv[7])
 
 lines_per_batch = 10000
 
@@ -94,7 +98,7 @@ last_index = 0
 # grow the set of barcodes one by one, ensuring they are 3 mismatches apart
 with open(all_barcodes_file,'r') as infile, open(validated_code_file,'w') as outfile:
     batch = []
-    codes = np.empty((max_codes,12),dtype=np.int64)
+    codes = np.empty((max_codes,barcode_len),dtype=np.int64)
     
     for line in infile:
         batch.append(line.strip())
