@@ -25,5 +25,7 @@ $ python generate_barcodes <length> <output file>
 Once the potential barcode strings have been generated, you can run `validate_barcodes.py` to get your barcodes by specifying the file of all possible codes, the name where your barcodes should be written, and how many barcodes you need:
 
 ```
-$ python validate_barcodes <input file> <output file> <number of codes>
+$ python validate_barcodes <input file> <output file> <number of codes> <length of bc> <low gc> <high gc> <num of mismatches>
+
 ```
+e.g. python3.8 validate_barcodes.py NIST_Barcode_raw.txt NIST_validate.txt 1000 18 0.4 0.6 3
