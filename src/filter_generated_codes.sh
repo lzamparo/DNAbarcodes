@@ -1,4 +1,6 @@
 #! /bin/bash
+### Qiyao modified a little bit based on modular cloning system in Thyer lab.
+# Gonna filter cutting site for BsaI,BsmBI,AarI
 
 ### Shuffle the generated inputs, and apply simple rules to prune unwanted barcodes 
 inputs=$1
